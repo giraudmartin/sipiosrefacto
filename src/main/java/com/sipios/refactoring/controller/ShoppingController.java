@@ -25,7 +25,8 @@ public class ShoppingController {
 
     @PostMapping
     public String getPrice(@RequestBody Body b) {
-        double p = 0;
+
+        double price = 0;
 
         Date date = new Date();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
@@ -44,11 +45,11 @@ public class ShoppingController {
                 Item it = b.getItems()[i];
 
                 if (it.getType().equals("TSHIRT")) {
-                    p += 30 * it.getNb() * customerDiscount;
+                    price += 30 * it.getNb() * customerDiscount;
                 } else if (it.getType().equals("DRESS")) {
-                    p += 50 * it.getNb() * customerDiscount;
+                    price += 50 * it.getNb() * customerDiscount;
                 } else if (it.getType().equals("JACKET")) {
-                    p += 100 * it.getNb() * customerDiscount;
+                    price += 100 * it.getNb() * customerDiscount;
                 }
                 // else if (it.getType().equals("SWEATSHIRT")) {
                 //     price += 80 * it.getNb();
@@ -63,11 +64,11 @@ public class ShoppingController {
                 Item it = b.getItems()[i];
 
                 if (it.getType().equals("TSHIRT")) {
-                    p += 30 * it.getNb() * customerDiscount;
+                    price += 30 * it.getNb() * customerDiscount;
                 } else if (it.getType().equals("DRESS")) {
-                    p += 50 * it.getNb() * 0.8 * customerDiscount;
+                    price += 50 * it.getNb() * 0.8 * customerDiscount;
                 } else if (it.getType().equals("JACKET")) {
-                    p += 100 * it.getNb() * 0.9 * customerDiscount;
+                    price += 100 * it.getNb() * 0.9 * customerDiscount;
                 }
                 // else if (it.getType().equals("SWEATSHIRT")) {
                 //     price += 80 * it.getNb();
@@ -77,27 +78,27 @@ public class ShoppingController {
 
         try {
             if (b.getType().equals("STANDARD_CUSTOMER")) {
-                if (p > 200) {
-                    throw new Exception("Price (" + p + ") is too high for standard customer");
+                if (price > 200) {
+                    throw new Exception("Price (" + price + ") is too high for standard customer");
                 }
             } else if (b.getType().equals("PREMIUM_CUSTOMER")) {
-                if (p > 800) {
-                    throw new Exception("Price (" + p + ") is too high for premium customer");
+                if (price > 800) {
+                    throw new Exception("Price (" + price + ") is too high for premium customer");
                 }
             } else if (b.getType().equals("PLATINUM_CUSTOMER")) {
-                if (p > 2000) {
-                    throw new Exception("Price (" + p + ") is too high for platinum customer");
+                if (price > 2000) {
+                    throw new Exception("Price (" + price + ") is too high for platinum customer");
                 }
             } else {
-                if (p > 200) {
-                    throw new Exception("Price (" + p + ") is too high for standard customer");
+                if (price > 200) {
+                    throw new Exception("Price (" + price + ") is too high for standard customer");
                 }
             }
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
-        return String.valueOf(p);
+        return String.valueOf(price);
     }
 
     private boolean isOnDiscountPeriods(Calendar cal) {

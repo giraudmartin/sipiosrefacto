@@ -47,7 +47,7 @@ public class ShoppingController {
             // Compute total amount depending on the types and quantity of product and
             // if we are in winter or summer discounts periods
             for (Item it : b.getItems()) {
-                switch(it.getType()) {
+                switch (it.getType()) {
                     case "TSHIRT":
                         price += 30 * it.getNb() * customer.getDiscount();
                         break;
@@ -81,11 +81,10 @@ public class ShoppingController {
         return false;
     }
 
-    private enum Customer
-    {
+    private enum Customer {
         STANDARD_CUSTOMER("standard", 1, 200),
-        PREMIUM_CUSTOMER("prenium",0.9, 800),
-        PLATINUM_CUSTOMER("platinium",0.5, 2000);
+        PREMIUM_CUSTOMER("prenium", 0.9, 800),
+        PLATINUM_CUSTOMER("platinium", 0.5, 2000);
 
         private final String label;
         private final double discount;
@@ -98,7 +97,7 @@ public class ShoppingController {
         }
 
         public static Customer getInstance(String customerType) {
-            switch(customerType) {
+            switch (customerType) {
                 case "STANDARD_CUSTOMER":
                     return STANDARD_CUSTOMER;
                 case "PREMIUM_CUSTOMER":
@@ -124,7 +123,7 @@ public class ShoppingController {
     }
 
     private double getCustomerDiscount(String customerType) {
-        switch(customerType) {
+        switch (customerType) {
             case "STANDARD_CUSTOMER":
                 return 1;
             case "PREMIUM_CUSTOMER":
@@ -148,7 +147,8 @@ class Body {
         this.type = t;
     }
 
-    public Body() {}
+    public Body() {
+    }
 
     public Item[] getItems() {
         return items;
@@ -219,7 +219,8 @@ class Item {
     private String type;
     private int nb;
 
-    public Item() {}
+    public Item() {
+    }
 
     public Item(String type, int quantity) {
         this.type = type;

@@ -28,7 +28,10 @@ public class ShoppingController {
 
         double price = 0;
 
-        double customerDiscount = getCustomerDiscount(b.getType());
+        Customer customer = Customer.getInstance(b.getType());
+        if (customer == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
 
         // If shopping cart is empty return 0
         if (b.getItems() == null) {
@@ -46,35 +49,21 @@ public class ShoppingController {
             for (Item it : b.getItems()) {
                 switch(it.getType()) {
                     case "TSHIRT":
-                        price += 30 * it.getNb() * customerDiscount;
+                        price += 30 * it.getNb() * customer.getDiscount();
                         break;
                     case "DRESS":
-                        price += 50 * it.getNb() * (isOnDiscountPeriods ? 0.8 : 1) * customerDiscount;
+                        price += 50 * it.getNb() * (isOnDiscountPeriods ? 0.8 : 1) * customer.getDiscount();
                         break;
                     case "JACKET":
-                        price += 100 * it.getNb() * (isOnDiscountPeriods ? 0.9 : 1) * customerDiscount;
+                        price += 100 * it.getNb() * (isOnDiscountPeriods ? 0.9 : 1) * customer.getDiscount();
                         break;
                 }
             }
         }
 
         try {
-            if (b.getType().equals("STANDARD_CUSTOMER")) {
-                if (price > 200) {
-                    throw new Exception("Price (" + price + ") is too high for standard customer");
-                }
-            } else if (b.getType().equals("PREMIUM_CUSTOMER")) {
-                if (price > 800) {
-                    throw new Exception("Price (" + price + ") is too high for premium customer");
-                }
-            } else if (b.getType().equals("PLATINUM_CUSTOMER")) {
-                if (price > 2000) {
-                    throw new Exception("Price (" + price + ") is too high for platinum customer");
-                }
-            } else {
-                if (price > 200) {
-                    throw new Exception("Price (" + price + ") is too high for standard customer");
-                }
+            if (price > customer.getMaxPrice()) {
+                throw new Exception("Price (" + price + ") is too high for " + customer.getLabel() + " customer");
             }
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -92,6 +81,47 @@ public class ShoppingController {
         return false;
     }
 
+    private enum Customer
+    {
+        STANDARD_CUSTOMER("standard", 1, 200),
+        PREMIUM_CUSTOMER("prenium",0.9, 800),
+        PLATINUM_CUSTOMER("platinium",0.5, 2000);
+
+        private final String label;
+        private final double discount;
+        private final double maxPrice;
+
+        Customer(String label, double discount, double maxPrice) {
+            this.label = label;
+            this.discount = discount;
+            this.maxPrice = maxPrice;
+        }
+
+        public static Customer getInstance(String customerType) {
+            switch(customerType) {
+                case "STANDARD_CUSTOMER":
+                    return STANDARD_CUSTOMER;
+                case "PREMIUM_CUSTOMER":
+                    return PREMIUM_CUSTOMER;
+                case "PLATINUM_CUSTOMER":
+                    return PLATINUM_CUSTOMER;
+                default:
+                    return null;
+            }
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public double getDiscount() {
+            return discount;
+        }
+
+        public double getMaxPrice() {
+            return maxPrice;
+        }
+    }
 
     private double getCustomerDiscount(String customerType) {
         switch(customerType) {

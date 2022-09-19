@@ -34,13 +34,14 @@ public class ShoppingController {
 
         double customerDiscount = getCustomerDiscount(b.getType());
 
+        // If shopping cart is empty return 0
+        if (b.getItems() == null) {
+            return "0";
+        }
+
         // Compute total amount depending on the types and quantity of product and
         // if we are in winter or summer discounts periods
         if (!isOnDiscountPeriods(cal)) {
-            if (b.getItems() == null) {
-                return "0";
-            }
-
             for (int i = 0; i < b.getItems().length; i++) {
                 Item it = b.getItems()[i];
 
@@ -56,10 +57,6 @@ public class ShoppingController {
                 // }
             }
         } else {
-            if (b.getItems() == null) {
-                return "0";
-            }
-
             for (int i = 0; i < b.getItems().length; i++) {
                 Item it = b.getItems()[i];
 

@@ -28,48 +28,33 @@ public class ShoppingController {
 
         double price = 0;
 
-        Date date = new Date();
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
-        cal.setTime(date);
-
         double customerDiscount = getCustomerDiscount(b.getType());
 
         // If shopping cart is empty return 0
         if (b.getItems() == null) {
             return "0";
-        }
-
-        // Compute total amount depending on the types and quantity of product and
-        // if we are in winter or summer discounts periods
-        if (!isOnDiscountPeriods(cal)) {
-            for (int i = 0; i < b.getItems().length; i++) {
-                Item it = b.getItems()[i];
-
-                if (it.getType().equals("TSHIRT")) {
-                    price += 30 * it.getNb() * customerDiscount;
-                } else if (it.getType().equals("DRESS")) {
-                    price += 50 * it.getNb() * customerDiscount;
-                } else if (it.getType().equals("JACKET")) {
-                    price += 100 * it.getNb() * customerDiscount;
-                }
-                // else if (it.getType().equals("SWEATSHIRT")) {
-                //     price += 80 * it.getNb();
-                // }
-            }
         } else {
-            for (int i = 0; i < b.getItems().length; i++) {
-                Item it = b.getItems()[i];
 
-                if (it.getType().equals("TSHIRT")) {
-                    price += 30 * it.getNb() * customerDiscount;
-                } else if (it.getType().equals("DRESS")) {
-                    price += 50 * it.getNb() * 0.8 * customerDiscount;
-                } else if (it.getType().equals("JACKET")) {
-                    price += 100 * it.getNb() * 0.9 * customerDiscount;
+            Date date = new Date();
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
+            cal.setTime(date);
+
+            boolean isOnDiscountPeriods = isOnDiscountPeriods(cal);
+
+            // Compute total amount depending on the types and quantity of product and
+            // if we are in winter or summer discounts periods
+            for (Item it : b.getItems()) {
+                switch(it.getType()) {
+                    case "TSHIRT":
+                        price += 30 * it.getNb() * customerDiscount;
+                        break;
+                    case "DRESS":
+                        price += 50 * it.getNb() * (isOnDiscountPeriods ? 0.8 : 1) * customerDiscount;
+                        break;
+                    case "JACKET":
+                        price += 100 * it.getNb() * (isOnDiscountPeriods ? 0.9 : 1) * customerDiscount;
+                        break;
                 }
-                // else if (it.getType().equals("SWEATSHIRT")) {
-                //     price += 80 * it.getNb();
-                // }
             }
         }
 
@@ -120,6 +105,7 @@ public class ShoppingController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
+
 }
 
 class Body {

@@ -1,8 +1,7 @@
 package com.sipios.refactoring.controller;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,10 +17,15 @@ public class ShoppingController {
 
     private Logger logger = LoggerFactory.getLogger(ShoppingController.class);
 
+    private static final List<DiscountPeriod> DISCOUNT_PERIODS = new ArrayList<>() {{
+        add(new DiscountPeriod("Summer period", Calendar.JUNE, 5, 15));
+        add(new DiscountPeriod("Winter period", Calendar.JANUARY, 5, 15));
+    }};
+
+
     @PostMapping
     public String getPrice(@RequestBody Body b) {
         double p = 0;
-
 
         Date date = new Date();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
@@ -31,18 +35,7 @@ public class ShoppingController {
 
         // Compute total amount depending on the types and quantity of product and
         // if we are in winter or summer discounts periods
-        if (
-            !(
-                cal.get(Calendar.DAY_OF_MONTH) < 15 &&
-                cal.get(Calendar.DAY_OF_MONTH) > 5 &&
-                cal.get(Calendar.MONTH) == 5
-            ) &&
-            !(
-                cal.get(Calendar.DAY_OF_MONTH) < 15 &&
-                cal.get(Calendar.DAY_OF_MONTH) > 5 &&
-                cal.get(Calendar.MONTH) == 0
-            )
-        ) {
+        if (!isOnDiscountPeriods(cal)) {
             if (b.getItems() == null) {
                 return "0";
             }
@@ -107,6 +100,16 @@ public class ShoppingController {
         return String.valueOf(p);
     }
 
+    private boolean isOnDiscountPeriods(Calendar cal) {
+        for (DiscountPeriod p : DISCOUNT_PERIODS) {
+            if (cal.get(Calendar.MONTH) == p.getMonth() && cal.get(Calendar.DAY_OF_MONTH) > p.getStartDay() && cal.get(Calendar.DAY_OF_MONTH) < p.getEndDay()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     private double getCustomerDiscount(String customerType) {
         switch(customerType) {
             case "STANDARD_CUSTOMER":
@@ -147,6 +150,53 @@ class Body {
 
     public void setType(String type) {
         this.type = type;
+    }
+}
+
+class DiscountPeriod {
+
+    private String title;
+    private int month;
+    private int startDay;
+    private int endDay;
+
+    public DiscountPeriod(String title, int month, int startDay, int endDay) {
+        this.title = title;
+        this.month = month;
+        this.startDay = startDay;
+        this.endDay = endDay;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
+    public int getStartDay() {
+        return startDay;
+    }
+
+    public void setStartDay(int startDay) {
+        this.startDay = startDay;
+    }
+
+    public int getEndDay() {
+        return endDay;
+    }
+
+    public void setEndDay(int endDay) {
+        this.endDay = endDay;
     }
 }
 

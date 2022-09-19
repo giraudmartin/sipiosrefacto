@@ -27,17 +27,7 @@ public class ShoppingController {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
         cal.setTime(date);
 
-        double customerDiscount;
-        // Compute discount for customer
-        if (b.getType().equals("STANDARD_CUSTOMER")) {
-            customerDiscount = 1;
-        } else if (b.getType().equals("PREMIUM_CUSTOMER")) {
-            customerDiscount = 0.9;
-        } else if (b.getType().equals("PLATINUM_CUSTOMER")) {
-            customerDiscount = 0.5;
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        double customerDiscount = getCustomerDiscount(b.getType());
 
         // Compute total amount depending on the types and quantity of product and
         // if we are in winter or summer discounts periods

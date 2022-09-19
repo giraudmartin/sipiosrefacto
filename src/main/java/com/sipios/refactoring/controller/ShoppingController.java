@@ -21,19 +21,20 @@ public class ShoppingController {
     @PostMapping
     public String getPrice(@RequestBody Body b) {
         double p = 0;
-        double d;
+
 
         Date date = new Date();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
         cal.setTime(date);
 
+        double customerDiscount;
         // Compute discount for customer
         if (b.getType().equals("STANDARD_CUSTOMER")) {
-            d = 1;
+            customerDiscount = 1;
         } else if (b.getType().equals("PREMIUM_CUSTOMER")) {
-            d = 0.9;
+            customerDiscount = 0.9;
         } else if (b.getType().equals("PLATINUM_CUSTOMER")) {
-            d = 0.5;
+            customerDiscount = 0.5;
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -60,11 +61,11 @@ public class ShoppingController {
                 Item it = b.getItems()[i];
 
                 if (it.getType().equals("TSHIRT")) {
-                    p += 30 * it.getNb() * d;
+                    p += 30 * it.getNb() * customerDiscount;
                 } else if (it.getType().equals("DRESS")) {
-                    p += 50 * it.getNb() * d;
+                    p += 50 * it.getNb() * customerDiscount;
                 } else if (it.getType().equals("JACKET")) {
-                    p += 100 * it.getNb() * d;
+                    p += 100 * it.getNb() * customerDiscount;
                 }
                 // else if (it.getType().equals("SWEATSHIRT")) {
                 //     price += 80 * it.getNb();
@@ -79,11 +80,11 @@ public class ShoppingController {
                 Item it = b.getItems()[i];
 
                 if (it.getType().equals("TSHIRT")) {
-                    p += 30 * it.getNb() * d;
+                    p += 30 * it.getNb() * customerDiscount;
                 } else if (it.getType().equals("DRESS")) {
-                    p += 50 * it.getNb() * 0.8 * d;
+                    p += 50 * it.getNb() * 0.8 * customerDiscount;
                 } else if (it.getType().equals("JACKET")) {
-                    p += 100 * it.getNb() * 0.9 * d;
+                    p += 100 * it.getNb() * 0.9 * customerDiscount;
                 }
                 // else if (it.getType().equals("SWEATSHIRT")) {
                 //     price += 80 * it.getNb();
@@ -114,6 +115,19 @@ public class ShoppingController {
         }
 
         return String.valueOf(p);
+    }
+
+    private double getCustomerDiscount(String customerType) {
+        switch(customerType) {
+            case "STANDARD_CUSTOMER":
+                return 1;
+            case "PREMIUM_CUSTOMER":
+                return 0.9;
+            case "PLATINUM_CUSTOMER":
+                return 0.5;
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 }
 
